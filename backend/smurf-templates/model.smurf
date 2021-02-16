@@ -1,0 +1,14 @@
+import "reflect-metadata";
+import { Entity, Column } from "typeorm";
+import { BaseEntity } from "@models/base-entity";
+import { VARCHAR_STR } from "@utilities/constants";
+
+@Entity()
+export class ModelName extends BaseEntity {
+/**
+  @Column({
+    length: VARCHAR_STR.MAX_LENGTH
+  })
+  [columnName]: string;
+*/
+}

@@ -1,0 +1,40 @@
+{
+  "compilerOptions": {
+      "emitDecoratorMetadata": true,
+      "experimentalDecorators": true,
+      "module": "commonjs",
+      "esModuleInterop": true,
+      "target": "es6",
+      "noImplicitAny": true,
+      "moduleResolution": "node",
+      "sourceMap": true,
+      "outDir": "dist",
+      "baseUrl": "src",
+      "paths": {
+        "" : [
+          "node_modules/*",
+          "src/*"
+        ],
+        "@core/*": [ "core/*" ],
+        "@utilities/*": [ "utilities/*" ],
+        "@config/*": [ "config/*" ],
+        "@models/*": [ "models/*" ],
+        "@services/*": [ "services/*" ],
+        "@error-handling/*": ["error-types/*"],
+        "@policies/*": ["policies/*"],
+        "@guards/*": ["guards/*"],
+        "@base/*": [ "*" ],
+      },
+      "lib": ["dom", "es5", "es6", "es7"],
+      "allowSyntheticDefaultImports": true,
+  },
+  "include": [
+      "src/**/*",
+      "src/*",
+  ],
+  "exclude": [
+    "dist/",
+    "migrations/*",
+    "src/core/*",
+  ]
+}
