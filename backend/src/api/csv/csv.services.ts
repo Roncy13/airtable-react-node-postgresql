@@ -5,10 +5,11 @@ import csvtojson from 'csvtojson';
 import { UploadedFile } from 'express-fileupload';
 import { Repository } from "typeorm";
 import { CsvFileDTO } from './csv-dto';
-import { ICsvCreateDetails, ICsvDetailsPayload, ICsvUpdateHeaderJobId, ICsvUpdateHeaderMsg, ICsvUpdateHeaderRowSize } from "./csv-interface";
+import { ICsvCreateDetails, ICsvDetailsPayload, ICsvUpdateHeaderJobId, ICsvUpdateHeaderMsg, ICsvUpdateHeaderRowSize, IGetDetailsPerPage } from "./csv-interface";
 import CsvQueueJob from "@utilities/queue";
 import { CsvDetails } from './csv-details.entity';
 import { GetConn } from '@core/models';
+import { NotEmpty } from "@utilities/dataHelper";
 
 const modelHeader = GetConnection(CsvHeader) as Repository<CsvHeader>;
 const modelDetails = GetConn(CsvDetails) as Repository<CsvDetails>;
@@ -24,6 +25,12 @@ export async function GetHeaderById(id: string) {
 
 export async function GetHeaderByIdWithRelation(id: string) {
   return modelHeader.findOne(id, { relations : ['details']});
+}
+
+export async function CheckIfHeaderExist(id: string) {
+  const result = await GetHeaderById(id);
+
+  return NotEmpty(result);
 }
 
 export async function UpdateHeaderMsg({id, dateUpdated = new Date(), ...params}: ICsvUpdateHeaderMsg) {
@@ -81,7 +88,6 @@ export async function InsertDetailsInCsv(header: string, file: UploadedFile) {
 
 export async function ConvertCsvToJson(file: UploadedFile) {
   return csvtojson().fromFile(file.tempFilePath) as any as CsvFileDTO[];
-
 }
 
 export async function GeneateRowsCsv(file: UploadedFile) {
@@ -95,15 +101,34 @@ export async function GeneateRowsCsv(file: UploadedFile) {
   return { headerId, jobId };
 }
 
-export async function GetDetailsByPage(file: UploadedFile) {
-  /*
-    const { id: headerId } = await GenerateHeaderForCsv(file);
-    const { id: jobId } = await InsertDetailsInCsv(headerId, file);
-    const jobToInt = parseInt(jobId.toString(), 10);
-    const payload: ICsvUpdateHeaderJobId = { jobId: jobToInt, id: headerId };
-    
-    await UpdateHeaderJobId(payload);
+export async function GetCountDetails({ header }: IGetDetailsPerPage) {
+  return modelDetails.count({ header });
+}
 
-    return { headerId, jobId };
-  */
+export async function GenerateOptionsForPage({ page }: IGetDetailsPerPage, total: number) {
+  const take = 10;
+
+  return {
+    take,
+    skip: page * 5
+  }
+}
+
+export async function GetDetails(header: string, options: any = {}) {
+  return modelDetails.find({
+    where: {
+      header
+    },
+    ...options
+  })
+}
+
+
+export async function GetDetailsByPage(payload: IGetDetailsPerPage) {
+  const total = await GetCountDetails(payload);
+  const options = await GenerateOptionsForPage(payload, total);
+  const header = await GetHeaderById(payload.header);
+  const details = await GetDetails(payload.header, options);
+
+  return { total, page: payload.page, header, details };
 }

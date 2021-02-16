@@ -32,3 +32,8 @@ export interface ICsvCreateDetails {
   header: CsvHeader,
   payload?: CsvFileDTO
 }
+
+export interface IGetDetailsPerPage {
+  header: string,
+  page: number
+}

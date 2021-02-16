@@ -1,7 +1,9 @@
 import SmurfResponse, { SmurfAction } from "@core/response";
 import { HTTP_METHODS } from "@utilities/constants";
-import { GeneateRowsCsv } from "./csv.services";
+import { GeneateRowsCsv, GetDetailsByPage } from "./csv.services";
 import { UploadedFile } from 'express-fileupload';
+import { CsvDetailsPageSchema } from "./csv.validators";
+import { IGetDetailsPerPage } from "./csv-interface";
 
 @SmurfAction({
   action: '/csv',
@@ -27,3 +29,19 @@ export class CsvApiCreate extends SmurfResponse {
     this.data = await GeneateRowsCsv(file as UploadedFile);
   }
 }
+
+@SmurfAction({
+  action: '/csv/details',
+  validation: CsvDetailsPageSchema,
+  message: 'Details has been fetched successfully',
+})
+export class CsvApiDetails extends SmurfResponse {
+
+  async run() {
+    const payload = this.req.query as unknown as IGetDetailsPerPage;
+
+    this.data = await GetDetailsByPage(payload);
+  }
+}
+
+
