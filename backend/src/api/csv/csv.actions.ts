@@ -1,9 +1,10 @@
 import SmurfResponse, { SmurfAction } from "@core/response";
 import { HTTP_METHODS } from "@utilities/constants";
-import { GeneateRowsCsv, GetDetailsByPage } from "./csv.services";
+import { GeneateRowsCsv, GetDetailsByPage, GetHeaderDetails } from "./csv.services";
 import { UploadedFile } from 'express-fileupload';
 import { CsvDetailsPageSchema } from "./csv.validators";
 import { IGetDetailsPerPage } from "./csv-interface";
+import { CsvCheckFilePolicy, CsvCheckRowsPolicy } from "./csv.policy";
 
 @SmurfAction({
   action: '/csv',
@@ -12,14 +13,15 @@ import { IGetDetailsPerPage } from "./csv-interface";
 export class CsvApi extends SmurfResponse {
 
   async run() {
-    this.data = 'index api for Csv';
+    this.data =  await GetHeaderDetails();
   }
 }
 
 @SmurfAction({
   action: '/csv',
   method: HTTP_METHODS.POST,
-  message: 'Csv File is being generated. Please see table list for details',
+  policies: [CsvCheckFilePolicy, CsvCheckRowsPolicy],
+  message: 'Csv File is being processed. Please see table list for details',
 })
 export class CsvApiCreate extends SmurfResponse {
 
@@ -43,5 +45,3 @@ export class CsvApiDetails extends SmurfResponse {
     this.data = await GetDetailsByPage(payload);
   }
 }
-
-

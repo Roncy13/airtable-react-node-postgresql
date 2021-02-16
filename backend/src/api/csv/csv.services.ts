@@ -132,3 +132,34 @@ export async function GetDetailsByPage(payload: IGetDetailsPerPage) {
 
   return { total, page: payload.page, header, details };
 }
+
+export async function GetHeaderDetails() {
+  return modelHeader.query(`
+    SELECT
+      csv_h.id, 
+      csv_h.filename, 
+      csv_h."jobId" , 
+      CASE 
+          WHEN csv_h.status = 0  THEN 'Inserting'
+          WHEN csv_h.status = 1  THEN 'Success'
+        ELSE 'failed'
+      end as status,
+      csv_h.message, 
+      csv_h."rows", 
+      csv_h."dateUpdated", 
+      csv_h."dateCreated",
+      count(csv_d."headerId")
+    FROM
+    csv_details csv_d INNER JOIN 
+    csv_header csv_h ON csv_h.id = csv_d."headerId"
+    GROUP BY
+      csv_h.id, 
+      csv_h.filename, 
+      csv_h."jobId" , 
+      csv_h.status, 
+      csv_h.message, 
+      csv_h."rows", 
+      csv_h."dateUpdated", 
+      csv_h."dateCreated"
+  `);
+}

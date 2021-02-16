@@ -12,10 +12,12 @@ export default async function CsvQueueJob() {
    
     try {
       const payloadRowSize: ICsvUpdateHeaderRowSize = { rowSize, id: header };
-     
+      
       await UpdateHeaderRowSize(payloadRowSize);
       await CreateCsvDetails(payload, header);
-
+      const payloadErr = {id: header, message: E_CsvJobStatusMsg.SUCCESS, status:  E_CsvJobStatus.SUCCESS }
+     
+      await UpdateHeaderMsg(payloadErr);
       await job.moveToCompleted();
     } catch(err: any | Error) {
       const message = err.message;

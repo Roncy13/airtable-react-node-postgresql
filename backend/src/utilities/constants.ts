@@ -20,8 +20,8 @@ export const SECRET_KEY = 'SAMPLE_SECRET_KEY';
 
 export enum E_CsvJobStatus {
   GENERATING = 0,
-  SUCCESS = 2,
-  FAILED = 3
+  SUCCESS = 1,
+  FAILED = 2
 }
 
 
