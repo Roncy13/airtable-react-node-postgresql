@@ -2,27 +2,20 @@ import React, { memo, useEffect, useState } from 'react';
 import PropTypes from 'prop-types';
 import { CsvListTableList } from './table-list';
 
-function CsvList({ getList, listData, doResetList }) {
+function CsvList({ listData }) {
   const [list, setList] = useState([]);
 
   useEffect(() => {
-    getList();
-
-    return () => {
-      doResetList();
-    };
-  }, []);
-
-  useEffect(() => {
-    const { success, data } = listData;
+    const { success } = listData;
 
     if (success) {
       const { data: list } = listData;
+
       setList(list.data || []);
     }
   }, [listData]);
 
-  return <CsvListTableList list={list} />;
+  return <CsvListTableList list={list} loading={listData.loading} />;
 }
 
 CsvList.propTypes = {

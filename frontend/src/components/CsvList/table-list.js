@@ -63,6 +63,10 @@ const useToolbarStyles = makeStyles(theme => ({
   },
 }));
 
+function generateKeyTable(id, field) {
+  return `${id}-${field}`;
+}
+
 const headCells = [
   {
     id: 'jobId',
@@ -72,14 +76,7 @@ const headCells = [
     id: 'filename',
     label: 'File Name',
   },
-  {
-    id: 'Status',
-    label: 'Status',
-  },
-  {
-    id: 'message',
-    label: 'Logs',
-  },
+
   {
     id: 'rows',
     label: 'No Of Rows in Csv',
@@ -95,6 +92,14 @@ const headCells = [
   {
     id: 'dateUpdated',
     label: 'Date Updated',
+  },
+  {
+    id: 'message',
+    label: 'Logs',
+  },
+  {
+    id: 'Status',
+    label: 'Status',
   },
 ];
 
@@ -132,7 +137,7 @@ const EnhancedTableToolbar = ({ loading }) => {
 };
 
 EnhancedTableToolbar.propTypes = {
-  loading: PropTypes.object,
+  loading: PropTypes.bool.isRequired,
 };
 
 export function formatNumber(num) {
@@ -230,13 +235,9 @@ const ListTable = ({ list, loading }) => {
                     .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                     .map(row => {
                       return (
-                        <TableRow>
+                        <TableRow key={generateKeyTable(row.id, 'table')}>
                           <TableCell align="right">{row.jobId}</TableCell>
                           <TableCell align="right">{row.filename}</TableCell>
-                          <TableCell align="right">
-                            {alertMsg(row.statusNumber, row.status)}
-                          </TableCell>
-                          <TableCell align="right">{row.message}</TableCell>
                           <TableCell align="right">
                             {formatNumber(row.rows)}
                           </TableCell>
@@ -245,6 +246,10 @@ const ListTable = ({ list, loading }) => {
                           </TableCell>
                           <TableCell align="right">{row.dateCreated}</TableCell>
                           <TableCell align="right">{row.dateUpdated}</TableCell>
+                          <TableCell align="right">{row.message}</TableCell>
+                          <TableCell align="right">
+                            {alertMsg(row.statusNumber, row.status)}
+                          </TableCell>
                         </TableRow>
                       );
                     })}
@@ -274,7 +279,7 @@ const ListTable = ({ list, loading }) => {
 
 ListTable.propTypes = {
   list: PropTypes.array.isRequired,
-  loading: PropTypes.boolean,
+  loading: PropTypes.bool.isRequired,
 };
 
 export const CsvListTableList = memo(ListTable);

@@ -45,8 +45,28 @@ export default function request(url, options) {
     .then(parseJSON);
 }
 
-export function axiosReq(url, method, options) {
-  return axs[method.toLowerCase()](url, options).then(checkStatus);
+export function* axiosReq(url, method, options) {
+  const result = yield axs[method.toLowerCase()](url, options).then(
+    checkStatus
+  );
+
+  return result;
+}
+
+export function* axiosReqFormData(url, method, data, options = {}) {
+  const config = {
+    ...options,
+    headers: {
+      'content-type': 'multipart/form-data',
+    },
+  };
+
+  return yield axs({
+    method: method.toLowerCase(),
+    url: url,
+    data,
+    headers: config,
+  }).then(checkStatus);
 }
 
 export const HTTP_METHODS = {

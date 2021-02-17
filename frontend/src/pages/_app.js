@@ -41,7 +41,7 @@ class Srr extends App {
     return (
       <React.StrictMode>
         <Head>
-          <title>React Next Boilerplate</title>
+          <title>CSV TEST EXAM</title>
         </Head>
 
         <Provider store={reduxStore}>

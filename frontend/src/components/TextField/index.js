@@ -60,12 +60,17 @@ function TextField(props) {
       type={type}
       error={NotEmpty(errorMsg)}
       helperText={errorMsg}
-      variant={variant}
+      variant={type !== 'file' ? variant : 'standard'}
+      InputProps={{ disableUnderline: type !== 'file' ? false : true }}
       onClick={() => SetModelToTouched(payload, setPayload, field)}
       onChange={({ target }) => {
-        SetModelValue(payload, setPayload, field, target.value);
+        SetModelValue(
+          payload,
+          setPayload,
+          field,
+          type === 'file' ? target.files[0] : target.value
+        );
       }}
-      value={payload[field].value}
       className={className.root}
     />
   );
