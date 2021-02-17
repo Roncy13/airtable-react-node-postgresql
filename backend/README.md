@@ -1,25 +1,14 @@
-# Smurfjs
+# INSTRUCTIONS
 
-Microservices design in top of Expressjs. Functional approach. Inspired by Adonis Nestjs Actionherojs.
+## Steps to Run the App
 
-type [npm run smurf] for creating actions, services and other available components.
+1. copy .env-sample and make it .env, change all properties applied on your machine
+2. npm install
+3. create database air-table in your postgres
+4. npm run typeorm migration:run
+5. npm run dev
 
-# Running the application in dev mode
+## Files To check
 
-type [npm run dev]
-
-# Deployment
-
-type [npm run start] or deploy it with pm2
-
-# Short Reminders
-
-- Guards is first to be checked before policy.
-- They are implemented in the same way, its just the ordering of execution and error type code are the only difference.
-- Please Stop Making Classical Approach. I Made this framework for Functional Approach.
-- This is the version 1 of the Framework.
-- There is an existing component in the user folder under api. Please check how api creation is implemented.
-- Happy coding.
-
-# Let the Code talk to you, HAHAHAHAHA
-- For Now, documentation is on the development, if you have question, you can create issues or email me at JamesRoncy13@gmail.com
+1. The Queue worker is in the src/utilities/queue.ts
+2. The api is in the src/api/csv/csv.actions.ts
