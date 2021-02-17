@@ -8,7 +8,7 @@ import { connect } from 'react-redux';
 import { createStructuredSelector } from 'reselect';
 import { getCsv, createCsv, resetCreateCsv, resetListCsv } from './actions';
 import { selectCreateCsv, selectCsv } from './selectors';
-import { modelProps, ValidationMsg } from 'utils/constants';
+import { modelProps } from 'utils/constants';
 import { Box } from '@material-ui/core';
 import { isObject } from 'lodash';
 import { toastr } from 'react-redux-toastr';
@@ -34,20 +34,12 @@ export function Home(props) {
   const startDate = new Date();
   const [requestAfter5Secs, setRequestAfter5Secs] = useState(null);
   const [timer, setTimer] = useState(startDate);
-  const {
-    getList,
-    listData,
-    doResetList,
-    doCreateCsv,
-    createCsvData,
-    doResetCsv,
-  } = props;
+  const { getList, listData, doResetList, doCreateCsv, createCsvData, doResetCsv } = props;
 
   // function for refreshing the page, getting the details of csv creation
   useEffect(() => {
     const checkDateRequested =
-      moment(timer).format('YYYYMMDDhh:mm:ss') ===
-      moment(requestAfter5Secs).format('YYYYMMDDhh:mm:ss');
+      moment(timer).format('YYYYMMDDhh:mm:ss') === moment(requestAfter5Secs).format('YYYYMMDDhh:mm:ss');
 
     if (checkDateRequested) {
       getList();
@@ -68,7 +60,7 @@ export function Home(props) {
 
   useEffect(() => {
     const { success } = listData;
-    console.log({ success });
+
     if (success) {
       const add5Seconds = moment()
         .add(5, 'seconds')
@@ -98,11 +90,6 @@ export function Home(props) {
 
   return (
     <Box display="flex" flexDirection="column">
-      <CsvList
-        listData={listData}
-        getList={getList}
-        doResetList={doResetList}
-      />
       {createCsvData.success ? (
         <></>
       ) : (
@@ -113,6 +100,9 @@ export function Home(props) {
           formState={formState}
         />
       )}
+      <Box mt={2}>
+        <CsvList listData={listData} getList={getList} doResetList={doResetList} />
+      </Box>
     </Box>
   );
 }
@@ -124,7 +114,6 @@ const mapStateToProps = createStructuredSelector({
 
 export function mapDispatchToProps(dispatch) {
   return {
-    getShowcases: () => dispatch(getShowcases()),
     getList: payload => dispatch(getCsv(payload)),
     doCreateCsv: payload => dispatch(createCsv(payload)),
     doResetCsv: () => dispatch(resetCreateCsv()),

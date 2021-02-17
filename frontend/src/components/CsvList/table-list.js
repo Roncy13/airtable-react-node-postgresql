@@ -60,6 +60,7 @@ const useToolbarStyles = makeStyles(theme => ({
         },
   title: {
     flex: '1 1 100%',
+    fontWeight: 'bold',
   },
 }));
 
@@ -108,9 +109,7 @@ export function EnhancedTableHead() {
     <TableHead>
       <TableRow>
         {headCells.map(headCell => (
-          <TableCell
-            key={headCell.id}
-            align={headCell.numeric ? 'right' : 'left'}>
+          <TableCell key={headCell.id} align={headCell.numeric ? 'right' : 'left'}>
             {headCell.label}
           </TableCell>
         ))}
@@ -125,11 +124,7 @@ const EnhancedTableToolbar = ({ loading }) => {
   const classes = useToolbarStyles();
   return (
     <Toolbar className={classes.root}>
-      <Typography
-        className={classes.title}
-        variant="h6"
-        id="tableTitle"
-        component="div">
+      <Typography className={classes.title} variant="h6" id="tableTitle" component="div">
         {loading ? 'Loading' : ' Csv List'}
       </Typography>
     </Toolbar>
@@ -175,26 +170,8 @@ export function alertMsg(status, statusMsg) {
 
 const ListTable = ({ list, loading }) => {
   const classes = useStyles();
-  const [order, setOrder] = useState('asc');
-  const [orderBy, setOrderBy] = useState('calories');
-  const [selected, setSelected] = useState([]);
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
-
-  const handleRequestSort = (event, property) => {
-    const isAsc = orderBy === property && order === 'asc';
-    setOrder(isAsc ? 'desc' : 'asc');
-    setOrderBy(property);
-  };
-
-  const handleSelectAllClick = event => {
-    if (event.target.checked) {
-      const newSelecteds = rows.map(n => n.name);
-      setSelected(newSelecteds);
-      return;
-    }
-    setSelected([]);
-  };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
@@ -205,54 +182,34 @@ const ListTable = ({ list, loading }) => {
     setPage(0);
   };
 
-  const emptyRows =
-    rowsPerPage - Math.min(rowsPerPage, list.length - page * rowsPerPage);
+  const emptyRows = rowsPerPage - Math.min(rowsPerPage, list.length - page * rowsPerPage);
 
   return (
     <div className={classes.root}>
       <Paper className={classes.paper}>
-        <EnhancedTableToolbar numSelected={selected.length} loading={loading} />
+        <EnhancedTableToolbar loading={loading} />
         {loading ? (
           <></>
         ) : (
           <>
             <TableContainer>
-              <Table
-                className={classes.table}
-                aria-labelledby="tableTitle"
-                aria-label="enhanced table">
-                <EnhancedTableHead
-                  classes={classes}
-                  numSelected={selected.length}
-                  order={order}
-                  orderBy={orderBy}
-                  onSelectAllClick={handleSelectAllClick}
-                  onRequestSort={handleRequestSort}
-                  rowCount={list.length}
-                />
+              <Table className={classes.table} aria-labelledby="tableTitle" aria-label="enhanced table">
+                <EnhancedTableHead classes={classes} rowCount={list.length} />
                 <TableBody>
-                  {list
-                    .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-                    .map(row => {
-                      return (
-                        <TableRow key={generateKeyTable(row.id, 'table')}>
-                          <TableCell align="right">{row.jobId}</TableCell>
-                          <TableCell align="right">{row.filename}</TableCell>
-                          <TableCell align="right">
-                            {formatNumber(row.rows)}
-                          </TableCell>
-                          <TableCell align="right">
-                            {formatNumber(row.insertedDetails)}
-                          </TableCell>
-                          <TableCell align="right">{row.dateCreated}</TableCell>
-                          <TableCell align="right">{row.dateUpdated}</TableCell>
-                          <TableCell align="right">{row.message}</TableCell>
-                          <TableCell align="right">
-                            {alertMsg(row.statusNumber, row.status)}
-                          </TableCell>
-                        </TableRow>
-                      );
-                    })}
+                  {list.slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage).map(row => {
+                    return (
+                      <TableRow key={generateKeyTable(row.id, 'table')}>
+                        <TableCell align="right">{row.jobId}</TableCell>
+                        <TableCell align="right">{row.filename}</TableCell>
+                        <TableCell align="right">{formatNumber(row.rows)}</TableCell>
+                        <TableCell align="right">{formatNumber(row.insertedDetails)}</TableCell>
+                        <TableCell align="right">{row.dateCreated}</TableCell>
+                        <TableCell align="right">{row.dateUpdated}</TableCell>
+                        <TableCell align="right">{row.message}</TableCell>
+                        <TableCell align="right">{alertMsg(row.statusNumber, row.status)}</TableCell>
+                      </TableRow>
+                    );
+                  })}
                   {emptyRows > 0 && (
                     <TableRow>
                       <TableCell colSpan={6} />
