@@ -1,0 +1,4 @@
+export const GET_CSV = 'APP/HOME/GET_CSV';
+export const CREATE_CSV = 'APP/HOME/CREATE_CSV';
+export const RESET_CREATE_CSV = 'APP/HOME/RESET_CREATE_CSV';
+export const RESET_LIST_CSV = 'APP/HOME/RESET_LIST_CSV';

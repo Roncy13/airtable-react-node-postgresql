@@ -6,10 +6,6 @@ const myFormat = printf(({ level, message, timestamp: ts }: any) => {
 });
 
 export default createLogger({
-  format: combine(
-    colorize(),
-    timestamp(),
-    myFormat,
-  ),
-  transports: [new transports.Console()]
+  format: combine(colorize(), timestamp(), myFormat),
+  transports: [new transports.Console()],
 });

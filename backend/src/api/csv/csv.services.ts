@@ -144,14 +144,16 @@ export async function GetHeaderDetails() {
           WHEN csv_h.status = 1  THEN 'Success'
         ELSE 'failed'
       end as status,
+      csv_h.status as "statusNumber",
       csv_h.message, 
-      csv_h."rows", 
-      csv_h."dateUpdated", 
-      csv_h."dateCreated",
-      count(csv_d."headerId")
+      csv_h."rows",
+      TO_CHAR(csv_h."dateUpdated", 'MM/DD/YYYY HH:MI AM') as "dateUpdated",
+      TO_CHAR(csv_h."dateCreated" , 'MM/DD/YYYY HH:MI AM') as "dateCreated",
+      count(csv_d."headerId") as "insertedDetails"
     FROM
-    csv_details csv_d INNER JOIN 
-    csv_header csv_h ON csv_h.id = csv_d."headerId"
+      csv_details csv_d 
+    INNER JOIN 
+      csv_header csv_h ON csv_h.id = csv_d."headerId"
     GROUP BY
       csv_h.id, 
       csv_h.filename, 
@@ -161,5 +163,6 @@ export async function GetHeaderDetails() {
       csv_h."rows", 
       csv_h."dateUpdated", 
       csv_h."dateCreated"
+    ORDER BY csv_h."dateCreated" desc
   `);
 }
