@@ -1,13 +1,30 @@
 import SmurfResponse, { SmurfAction } from "@core/response";
-import { UserAllSrv, UserById, UserCreate, UserUpdate } from "./user.services";
-import { UserDTO } from './user.dto';
+import { AuthenticateTokenGuard } from "@guards/authentication.guard";
 import { HTTP_METHODS } from "@utilities/constants";
-import { UserByIdSchema, UserSchema, UserUpdateSchema } from "./user.validators";
-import { UserGuard } from './user.guard';
-import { UserPolicy } from './user.policy';
+import { UserAuthPolicy, UserPolicy } from './user.policy';
+import { UserAllSrv, UserAuthJwtSrv, UserById, UserCreate, UserUpdate } from "./user.services";
+import { UserAuthTransformer } from './user.transformer';
+import { UserAuthSchema, UserByIdSchema, UserSchema, UserUpdateSchema } from "./user.validators";
+
+@SmurfAction({
+  action: '/user/auth',
+  method: HTTP_METHODS.POST,
+  policies: [UserAuthPolicy],
+  validation: UserAuthSchema,
+  message: 'User logged in successfully',
+})
+export class SampleAuthenticationApi extends SmurfResponse {
+
+  async run() {
+    const payload = UserAuthTransformer(this.req.body);
+
+    this.data = await UserAuthJwtSrv(payload);
+  }
+}
 
 @SmurfAction({
   action: '/user',
+  guards: [AuthenticateTokenGuard],
   message: 'User fetched successfully',
 })
 export class UserApi extends SmurfResponse {
@@ -20,6 +37,7 @@ export class UserApi extends SmurfResponse {
 @SmurfAction({
   action: '/user',
   method: HTTP_METHODS.POST,
+  guards: [AuthenticateTokenGuard],
   message: 'User created successfully',
   validation: UserSchema
 })
@@ -34,6 +52,7 @@ export class UserCreateApi extends SmurfResponse {
 
 @SmurfAction({
   action: '/user/:id',
+  guards: [AuthenticateTokenGuard],
   message: 'User fetch successfully',
   validation: UserByIdSchema
 })
@@ -49,6 +68,7 @@ export class UserGetById extends SmurfResponse {
 @SmurfAction({
   action: '/user/:id',
   method: HTTP_METHODS.PATCH,
+  guards: [AuthenticateTokenGuard],
   message: 'User created successfully',
   validation: UserUpdateSchema
 })
@@ -65,14 +85,12 @@ export class UserUpdateApi extends SmurfResponse {
   action: '/user/middlewares',
   method: HTTP_METHODS.POST,
   message: 'User with guard and policy successfully',
-  guards: [UserGuard],
+  guards: [AuthenticateTokenGuard],
   policies: [UserPolicy]
 })
 export class UserWithPolicyAndGuard extends SmurfResponse {
 
   async run() {
-    const { body, params } = this.req;
-
     this.data = await UserAllSrv();
   }
 }

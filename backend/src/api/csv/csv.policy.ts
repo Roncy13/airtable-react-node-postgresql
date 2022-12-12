@@ -10,7 +10,7 @@ import PolicyError from './../../core/policy.error';
 
 // example Policy Controller for Smurf
 export const CsvCheckFilePolicy = async(req: Request, res: Response, next: any) => {
-  
+
   if (CheckEmpty(req.files)) {
     const payload: IPolicy = {
       message: 'No File has been submitted',
@@ -21,7 +21,7 @@ export const CsvCheckFilePolicy = async(req: Request, res: Response, next: any) 
   }
 
   const file = req.files.file as UploadedFile;
- 
+
   if (CheckEmpty(file)) {
     const payload: IPolicy = {
       message: 'File csv does not exist',
@@ -41,7 +41,7 @@ export const CsvCheckFilePolicy = async(req: Request, res: Response, next: any) 
     const NotCsvPolicy = new PolicyError(payload);
     return next(NotCsvPolicy);
   }
-  
+
   next();
 }
 
@@ -67,13 +67,13 @@ export const CsvCheckRowsPolicy = async(req: Request, res: Response, next: any) 
     'csv.*.email': `required|string|email|max:${VARCHAR_STR.MAX_LENGTH}`,
   };
 
-  let validation = new Validator({ csv: json }, rules);
+  const validation = new Validator({ csv: json }, rules);
   const checkResult = validation.passes();
   if (!checkResult) {
     const err = validation.errors.all();
     const keyErr = Object.keys(err);
     const firstError = err[keyErr[0]][0];
-    
+
     const payload: IPolicy = {
       message: `Something wrong in the CSV file data values: ${firstError}`,
       name: 'CsvCheckRowsPolicy'
@@ -84,7 +84,7 @@ export const CsvCheckRowsPolicy = async(req: Request, res: Response, next: any) 
   }
 
 
-  
-  
+
+
   next();
 }

@@ -1,54 +1,42 @@
-import { Request } from "express";
-import IGuard from '@error-handling/iguard.interface';
-import { StatusCodes } from 'http-status-codes';
-import GuardError from '@core/guard.error';
-import { verify } from 'jsonwebtoken'
+import GuardError from "@core/guard.error";
+import { NextFunction, Request, Response } from 'express';
+import { StatusCodes } from "http-status-codes";
+import jwt from 'jsonwebtoken';
 
-const checkEncodedToken = (token: string) => {
-  const arrayToken = token.split('.')
-  if(arrayToken.length !== 3) {
-    return false
+export const AuthenticateTokenGuard = async (req: Request, res: Response, next: NextFunction) =>{
+  const bearerHeader = (req.headers.authorization || req.query.authorization as string) ?? '';
+  console.log(bearerHeader, ' headers');
+  const token = bearerHeader.split(' ')[1] ?? null;
+  const errPolicy = new GuardError({
+    message: 'You are not log in',
+    errors: "Error Token",
+    name: 'No access',
+    statusCode: StatusCodes.FORBIDDEN
+  });
+  console.log(token)
+  if (token == null) {
+    return next(errPolicy);
   }
 
-  const decoded = verify(token, process.env.SECRET_KEY);
-  return decoded
-}
-
-const checkToken = (authorization: string) => {
-  const token = authorization.split(' ')
-  const headerPrefix = token[0]
-  const accessToken = token[1]
-  if(headerPrefix !== 'JWT') {
-    return false
+  const decode = jwt.decode(token) as any;
+  console.log(decode, 'decode');
+  if (!(decode?.username ?? false)) {
+    return next(errPolicy);
   }
 
-  const decodedToken = checkEncodedToken(accessToken)
-  if(!decodedToken) {
-    return false
-  }
+  jwt.verify(token, process.env.SECRET_ACCESS_TOKEN, (err: any, user: any) => {
 
-  return decodedToken
-}
+    if (err) {
+      return next(errPolicy);
+    }
 
-export default  (req: Request, res: Response, next: any) => {
-  // tslint:disable-next-line:no-console
-  console.log('Implement like Policy Sample in user, difference is it will just be execute first before validation and policies');
+    const details = {
+      userAgent: req.headers["user-agent"],
+      ip: req.header('x-forwarded-for') || req.connection.remoteAddress
+    }
 
-  const payload: IGuard = {
-    message: 'This Route is not allowed to access',
-    errors: [],
-    statusCode: StatusCodes.UNAUTHORIZED,
-    name: 'Not Allowed'
-  }
+    res.locals = {...user, ...details};
 
-  const guardErr = new GuardError(payload);
-
-  const { authorization } = req.headers
-  const verifyToken: any = checkToken(authorization)
-  if(!verifyToken) {
-    next(guardErr);
-  }
-
-  // add the guardErr in next to execute the guard handling
-  next();
+    next();
+  });
 }

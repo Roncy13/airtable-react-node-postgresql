@@ -34,12 +34,20 @@ export function Home(props) {
   const startDate = new Date();
   const [requestAfter5Secs, setRequestAfter5Secs] = useState(null);
   const [timer, setTimer] = useState(startDate);
-  const { getList, listData, doResetList, doCreateCsv, createCsvData, doResetCsv } = props;
+  const {
+    getList,
+    listData,
+    doResetList,
+    doCreateCsv,
+    createCsvData,
+    doResetCsv,
+  } = props;
 
   // function for refreshing the page, getting the details of csv creation
   useEffect(() => {
     const checkDateRequested =
-      moment(timer).format('YYYYMMDDhh:mm:ss') === moment(requestAfter5Secs).format('YYYYMMDDhh:mm:ss');
+      moment(timer).format('YYYYMMDDhh:mm:ss') ===
+      moment(requestAfter5Secs).format('YYYYMMDDhh:mm:ss');
 
     if (checkDateRequested) {
       getList();
@@ -50,7 +58,7 @@ export function Home(props) {
     getList();
     const interval = setInterval(() => {
       setTimer(new Date());
-    }, 1000);
+    }, 10000);
 
     return () => {
       clearInterval(interval);
@@ -101,7 +109,11 @@ export function Home(props) {
         />
       )}
       <Box mt={2}>
-        <CsvList listData={listData} getList={getList} doResetList={doResetList} />
+        <CsvList
+          listData={listData}
+          getList={getList}
+          doResetList={doResetList}
+        />
       </Box>
     </Box>
   );

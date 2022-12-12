@@ -23,6 +23,7 @@ export default abstract class SmurfResponse extends ISmurfOptions {
     params: object;
     resp: Response;
     req: Request;
+    className: string;
 
     constructor(args: any) {
       super();

@@ -35,38 +35,37 @@ export async function CheckIfHeaderExist(id: string) {
 
 export async function UpdateHeaderMsg({id, dateUpdated = new Date(), ...params}: ICsvUpdateHeaderMsg) {
   const header = await GetHeaderById(id);
-  
+
   header.status = params.status;
   header.message = params.message;
   header.dateUpdated = dateUpdated;
-  
+
   return await modelHeader.save(header);
 }
 
 export async function UpdateHeaderJobId({id, dateUpdated = new Date(), ...params}: ICsvUpdateHeaderJobId) {
   const header = await GetHeaderById(id);
-  
+
   header.jobId = params.jobId;
   header.dateUpdated = dateUpdated;
-  
+
   return await modelHeader.save(header);
 }
 
 export async function CreateCsvDetails(payload: CsvFileDTO[], parentID: string) {
   const details = payload.map((row) => ({...row, header: parentID}));
 
-  // batch not working, so i decided to loop insert manually
-  for (const index in details) {
-    await modelDetails.createQueryBuilder().insert().values(details[index]).execute();
+  for (const row of details) {
+    await modelDetails.createQueryBuilder().insert().values(row).execute();
   }
 }
 
 export async function UpdateHeaderRowSize({id, dateUpdated = new Date(), ...params}: ICsvUpdateHeaderRowSize) {
   const header = await GetHeaderById(id);
-  
+
   header.rows = params.rowSize;
   header.dateUpdated = dateUpdated;
-  
+
   return await modelHeader.save(header);
 }
 
@@ -82,7 +81,7 @@ export async function GenerateHeaderForCsv(file: UploadedFile) {
 export async function InsertDetailsInCsv(header: string, file: UploadedFile) {
   const rows = await ConvertCsvToJson(file);
   const payload: ICsvDetailsPayload = { header, payload: rows, rowSize: rows.length };
-  
+
   return await (await CsvQueueJob()).add(payload);
 }
 
@@ -95,7 +94,7 @@ export async function GeneateRowsCsv(file: UploadedFile) {
   const { id: jobId } = await InsertDetailsInCsv(headerId, file);
   const jobToInt = parseInt(jobId.toString(), 10);
   const payload: ICsvUpdateHeaderJobId = { jobId: jobToInt, id: headerId };
-  
+
   await UpdateHeaderJobId(payload);
 
   return { headerId, jobId };
@@ -136,32 +135,32 @@ export async function GetDetailsByPage(payload: IGetDetailsPerPage) {
 export async function GetHeaderDetails() {
   return modelHeader.query(`
     SELECT
-      csv_h.id, 
-      csv_h.filename, 
-      csv_h."jobId" , 
-      CASE 
+      csv_h.id,
+      csv_h.filename,
+      csv_h."jobId" ,
+      CASE
           WHEN csv_h.status = 0  THEN 'Inserting'
           WHEN csv_h.status = 1  THEN 'Success'
         ELSE 'failed'
       end as status,
       csv_h.status as "statusNumber",
-      csv_h.message, 
+      csv_h.message,
       csv_h."rows",
       TO_CHAR(csv_h."dateUpdated", 'MM/DD/YYYY HH:MI AM') as "dateUpdated",
       TO_CHAR(csv_h."dateCreated" , 'MM/DD/YYYY HH:MI AM') as "dateCreated",
       count(csv_d."headerId") as "insertedDetails"
     FROM
-      csv_details csv_d 
-    INNER JOIN 
+      csv_details csv_d
+    INNER JOIN
       csv_header csv_h ON csv_h.id = csv_d."headerId"
     GROUP BY
-      csv_h.id, 
-      csv_h.filename, 
-      csv_h."jobId" , 
-      csv_h.status, 
-      csv_h.message, 
-      csv_h."rows", 
-      csv_h."dateUpdated", 
+      csv_h.id,
+      csv_h.filename,
+      csv_h."jobId" ,
+      csv_h.status,
+      csv_h.message,
+      csv_h."rows",
+      csv_h."dateUpdated",
       csv_h."dateCreated"
     ORDER BY csv_h."dateCreated" desc
   `);

@@ -1,5 +1,4 @@
 import { createSelector } from 'reselect';
-import { defaultStates } from 'utils/constants';
 
 import { initialState } from './reducer';
 

@@ -24,6 +24,17 @@ export const UserSchema: Schema = {
   }
 };
 
+export const UserAuthSchema: Schema = {
+  username: {
+    ...inBody,
+    notEmpty: true
+  },
+  password: {
+    ...inBody,
+    notEmpty: true
+  },
+}
+
 export const UserByIdSchema: Schema = {
   id: {
     ...inParam,

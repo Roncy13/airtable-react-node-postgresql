@@ -1,10 +1,9 @@
-import  "reflect-metadata";
-import { GetConnection } from '@config/database';
-import { User } from './user.entity';
-import { UserDTO } from './user.dto';
+import "reflect-metadata";
 import { GetConn } from "@core/models";
 import { Repository } from "typeorm";
-import { first } from "lodash";
+import { UserAuthDTO, UserDTO } from './user.dto';
+import { User } from './user.entity';
+import jwt from 'jsonwebtoken';
 
 const model = GetConn(User) as Repository<User>;
 
@@ -18,6 +17,15 @@ export function UserById(id: string): Promise<User> {
 
 export function UserCreate(payload: UserDTO) {
   return model.save(payload);
+}
+
+export function UserAuthSrv(payload: UserAuthDTO) {
+  return payload.username === 'james' && payload.password === 'james'
+}
+
+export function UserAuthJwtSrv(payload: UserAuthDTO) {
+  const accessToken = jwt.sign({ username: payload.username }, process.env.SECRET_ACCESS_TOKEN, { expiresIn: "5d" });
+  return accessToken;
 }
 
 export async function UserUpdate(payload: UserDTO, id: string) {
